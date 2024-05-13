@@ -1,8 +1,8 @@
-import sys
 
 from PIL import Image as im
 
 from random import randint
+from sys import argv
 from time import sleep
 
 # List of every pokemon if someone searches by name
@@ -135,11 +135,12 @@ def pksearch(query, alt = None):
     elif query in pklist:
         return spritePrint(str(pklist.index(query.title())+1))
 
-match len(sys.argv):
-    case 3:
-        if sys.argv[1].title() in ("201", "351", "386", "Unown", "Castform", "Deoxys"):
-            pksearch(sys.argv[1], sys.argv[2])
-    case 2:
-        pksearch(sys.argv[1])
-    case 1:
-        pksearch("random")
+if __name__ == "__main__":
+    match len(argv):
+        case 3:
+            if sys.argv[1].title() in ("201", "351", "386", "Unown", "Castform", "Deoxys"):
+                pksearch(argv[1].title(), argv[2].title())
+        case 2:
+            pksearch(argv[1].title())
+        case 1:
+            pksearch("random")
