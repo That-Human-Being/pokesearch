@@ -1,4 +1,5 @@
-#Open Source library found at https://github.com/python-pillow/Pillow
+import sys
+
 from PIL import Image as im
 
 from random import randint
@@ -61,7 +62,6 @@ def spritePrint(pkid):
     # Loop over each pixel in a nested loop over each row of 32 pixels
     for y in range(32):
         for x in range(32):
-            # This function returns a list (r, g, b, a) of the red, green, blue, and alpha values of the pixel (x, y)
             pixel = sprite.getpixel((x,y))
             if pixel[3] == 0:
                 # Display nothing if the pixel is trasperant
@@ -72,7 +72,7 @@ def spritePrint(pkid):
                 print(f'\033[48;2;{pixel[0]};{pixel[1]};{pixel[2]}m'+f'\033[38;2;{pixel[0]};{pixel[1]};{pixel[2]}m'+"  "+f'\033[0m', end="", flush=True)
         print(f'\033[0m')
 
-def pksearch(query):
+def pksearch(query, alt = None):
     global pklist
     global unownlst
     global castformlst
@@ -80,14 +80,27 @@ def pksearch(query):
     # See if the user is searching by ID
     if query.isnumeric():
         # Make sure the user isn't searching for a pokemon with more than 1 sprite associated with it
-        if int(query) <= 386 and int(query) >= 1 and ("201", "351", "386").count(query) == 0:
+        if int(query) <= 386 and int(query) >= 1 and not query in ("201", "351", "386"):
             return spritePrint(query)
         elif int(query) == 201:
-            # Print a random Unown
-            return spritePrint(query+"-"+str(randint(0, 27)))
-        elif int(query) == 351 or int(query) == 386:
-            # Print a random Castform or Deoxys
-            return spritePrint(query+"-"+str(randint(0, 3)))
+            if alt == None:
+                return spritePrint(query+"-"+str(randint(0, 27)))
+            elif alt in unownlst:
+                return spritePrint(query+"-"+str(unownlst.index(alt)))
+        elif int(query) == 351:
+            if alt == None:
+                return spritePrint(query+"-"+str(randint(0, 3)))
+            elif alt.title() in castformlst:
+                return spritePrint(query+"-"+str(castformlst.index(alt)))
+            elif alt in (0, 1, 2, 3):
+                return spritePritn(query+"-"+alt)
+        elif int(query) == 386:
+            if alt == None:
+                return spritePrint(query+"-"+str(randint(0,3)))
+            elif alt.title() in deoxyslst:
+                return spritePrint(query+"-"+str(deoxyslst.index(alt)))
+            elif alt in (0, 1, 2, 3):
+                return spritePrint(query+"-"+alt)
         else:
             return pksearch("Lol Error")
     # Print a specific Unown
@@ -102,32 +115,31 @@ def pksearch(query):
     elif query.lower() == "random":
         return pksearch(str(randint(1, 386)))
     # Exceptions for Unown, Castform, or Deoyxs
-    elif query.title()[0:5] == "Unown" and len(query) == 5 or len(query) == 7:
-        if len(query) == 5:
+    elif query.title() == "Unown":
+        if alt == None:
             return pksearch("201")
-        elif len(query) == 7 and unownlst.count(query[6].upper()) == 1 and query[5] == " " or query[5] == "-":
-            return spritePrint("201-"+str(unownlst.index(query[6].upper())))
-    elif query.title()[0:8] == "Castform":
-        if len(query) == 8:
+        elif alt in unownlst:
+            return spritePrint("201-"+str(unownlst.index(alt.upper())))
+    elif query.title() == "Castform":
+        if alt == None:
             return pksearch("351")
-        elif castformlst.count(query[9:].title()) == 1 and query[8] == " " or query[8] == "-":
-            return spritePrint("351-"+str(castformlst.index(query[9:].title())))
+        elif alt in castformlst:
+            return spritePrint("351-"+str(castformlst.index(alt.title())))
         else:
             return pksearch("Lol Error")
-    elif query[0:6].title() == "Deoxys":
-         if len(query) == 6:
+    elif query.title() == "Deoxys":
+         if alt == None:
             return pksearch("386")
-         elif deoxyslst.count(query[7:].title()) == 1 and query[6] == " " or query[6] == "-":
-            return spritePrint("386-"+str(deoxyslst.index(query[7:].title())))
-    elif pklist.count(query) == 1:
+         elif alt in deoxyslst:
+            return spritePrint("386-"+str(deoxyslst.index(alt.title())))
+    elif query in pklist:
         return spritePrint(str(pklist.index(query.title())+1))
-    else:
-        print("That is not a valid Pokemon, please enter the ID or name of a Pokemon from the first three generations.")
-        return pksearch(str(input("Please enter a valid Pokemon name or ID ")))
 
-# Instructions to user
-print("This tool will display any Pokemon from the first three generations (the first 386 Pokemon)")
-sleep(1)
-print("You can search by ID number, by species name, or type 'random' for a suprise")
-sleep(1)
-pksearch(str(input("Pick your Pokemon: ")))
+match len(sys.argv):
+    case 3:
+        if sys.argv[1].title() in ("201", "351", "386", "Unown", "Castform", "Deoxys"):
+            pksearch(sys.argv[1], sys.argv[2])
+    case 2:
+        pksearch(sys.argv[1])
+    case 1:
+        pksearch("random")
