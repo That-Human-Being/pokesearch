@@ -153,45 +153,25 @@ def spritePrint(pkid):
         print(f'\x1b[0m')
 
 def pksearch(query, alt = None):
-    global pklist
-    global unownlst
-    global castformlst
-    global deoxyslst
     # See if the user is searching by ID
     if query.isnumeric():
         # Make sure the user isn't searching for a pokemon with more than 1 sprite associated with it
-        if int(query) <= 386 and int(query) >= 1 and not query in ("201", "351", "386"):
+        if int(query) in range(1, 386 + 1) and not query in ("201", "351", "386"):
             return spritePrint(query)
         elif int(query) == 201:
             if alt == None:
                 return spritePrint(query+"-"+str(randint(0, 27)))
             elif alt in unownlst:
                 return spritePrint(query+"-"+str(unownlst.index(alt)))
-        elif int(query) == 351:
+        elif int(query) in (351, 386):
             if alt == None:
                 return spritePrint(query+"-"+str(randint(0, 3)))
             elif alt.title() in castformlst:
                 return spritePrint(query+"-"+str(castformlst.index(alt)))
-            elif alt in ('0', '1', '2', '3'):
-                return spritePrint(query+"-"+alt)
-        elif int(query) == 386:
-            if alt == None:
-                return spritePrint(query+"-"+str(randint(0,3)))
             elif alt.title() in deoxyslst:
                 return spritePrint(query+"-"+str(deoxyslst.index(alt)))
             elif alt in ('0', '1', '2', '3'):
                 return spritePrint(query+"-"+alt)
-        else:
-            return pksearch("Lol Error")
-    # Print a specific Unown
-    elif query[0:4] == "201-" and list(str(l) for l in range(0, 28)).count(query[4:]) == 1:
-        return spritePrint(query)
-    elif query[0:4] == "201-" and unownlst.count((query[4].upper())) == 1 and len(query) == 5:
-        return spritePrint("201-"+str(unownlst.index(query[5].upper())))
-    # Print a specific Castform or Deoxys
-    elif (query[0:4] == "351-" or query[0:4] == "386-") and list(str(l) for l in range(4)).count(query[4]) == 1 and len(query) == 5:
-        return spritePrint(query)
-    # Print a random Pokemon
     elif query.lower() == "random":
         return pksearch(str(randint(1, 386)))
     # Exceptions for Unown, Castform, or Deoyxs
@@ -205,8 +185,6 @@ def pksearch(query, alt = None):
             return pksearch("351")
         elif alt in castformlst:
             return spritePrint("351-"+str(castformlst.index(alt.title())))
-        else:
-            return pksearch("Lol Error")
     elif query.title() == "Deoxys":
          if alt == None:
             return pksearch("386")
@@ -221,6 +199,11 @@ if __name__ == "__main__":
             if argv[1].title() in ("201", "351", "386", "Unown", "Castform", "Deoxys"):
                 pksearch(argv[1].title(), argv[2].title())
         case 2:
-            pksearch(argv[1].title())
+            if argv[1] == "--help":
+                print("pokesearch.py [PKMN] [VARIENT]")
+                print("  PKMN    can either be a species name or pokedex number")
+                print("  VARIENT Only use to diplay a specific Unown, Castform, or Deoxys")
+            else:
+                pksearch(argv[1].title())
         case 1:
             pksearch("random")
