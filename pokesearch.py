@@ -1,3 +1,4 @@
+import os
 
 from PIL import Image as im
 
@@ -137,7 +138,9 @@ crop = {
 
 # Opens an image and prints it as ascii character backgrounds
 def spritePrint(pkid):
-    sprite = (im.open(str(__file__)[:-13]+'icons/icon-'+pkid+'.png')).convert('RGBA')
+    dirPath = os.path.dirname(os.path.realpath(__file__))
+    pngPath = os.path.join(dirPath, 'icons', f'icon-{pkid}.png')
+    sprite = (im.open(pngPath).convert('RGBA')
     pkrange = crop[pkid]
     # Loop over each pixel in a nested loop over each row of 32 pixels
     for y in range(pkrange[0], pkrange[1] + 1):
