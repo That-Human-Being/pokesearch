@@ -140,7 +140,7 @@ crop = {
 def spritePrint(pkid):
     dirPath = os.path.dirname(os.path.realpath(__file__))
     pngPath = os.path.join(dirPath, 'icons', f'icon-{pkid}.png')
-    sprite = (im.open(pngPath).convert('RGBA')
+    sprite = (im.open(pngPath)).convert('RGBA')
     pkrange = crop[pkid]
     # Loop over each pixel in a nested loop over each row of 32 pixels
     for y in range(pkrange[0], pkrange[1] + 1):
